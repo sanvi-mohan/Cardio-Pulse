@@ -1,0 +1,592 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Cardio Pulse</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body class="dashboard-page">
+
+<header class="navbar">
+    <div class="logo">
+        <i class="fa-solid fa-heart-pulse"></i>
+        Cardio <b>Pulse</b>
+    </div>
+
+    <div class="nav-buttons">
+        <span id="welcomeName">Welcome!</span>
+        <button class="signup-btn" onclick="logoutUser()">Logout</button>
+    </div>
+</header>
+
+<main class="dashboard-container">
+
+    <div class="dashboard-heading">
+        <div>
+            <h1>Personal Health Dashboard</h1>
+            <p>Here's your health overview.</p>
+        </div>
+        <span class="dashboard-date" id="todayDate"></span>
+    </div>
+
+    <!-- SMARTWATCH -->
+
+    <section class="watch-panel">
+        <div>
+            <h2><i class="fa-solid fa-watch"></i> Smartwatch Connection</h2>
+            <p id="watchStatus">No smartwatch connected</p>
+            <small>Compatible device integration is not active yet.</small>
+        </div>
+
+        <button class="primary-btn" onclick="connectWatch()">
+            Connect Device
+        </button>
+    </section>
+
+    <!-- HEALTH MEASUREMENTS -->
+
+    <h2 class="dashboard-section-title">Your Health Measurements</h2>
+
+    <section class="health-grid">
+
+        <div class="health-tile">
+            <i class="fa-solid fa-heart-pulse"></i>
+            <p>Heart Rate</p>
+            <h2 id="heartRateValue">-- BPM</h2>
+            <span>Latest saved reading</span>
+        </div>
+
+        <div class="health-tile">
+            <i class="fa-solid fa-droplet"></i>
+            <p>Blood Pressure</p>
+            <h2 id="bloodPressureValue">-- / --</h2>
+            <span>Latest saved reading</span>
+        </div>
+
+        <div class="health-tile">
+            <i class="fa-solid fa-lungs"></i>
+            <p>Oxygen Level</p>
+            <h2 id="oxygenValue">-- %</h2>
+            <span>Latest saved reading</span>
+        </div>
+
+        <div class="health-tile">
+            <i class="fa-solid fa-temperature-half"></i>
+            <p>Temperature</p>
+            <h2 id="temperatureValue">-- °C</h2>
+            <span>Latest saved reading</span>
+        </div>
+
+        <div class="health-tile">
+            <i class="fa-solid fa-lungs"></i>
+            <p>Respiratory Rate</p>
+            <h2 id="respiratoryValue">-- /min</h2>
+            <span>Latest saved reading</span>
+        </div>
+
+        <div class="health-tile">
+            <i class="fa-solid fa-weight-scale"></i>
+            <p>Weight</p>
+            <h2 id="weightValue">-- kg</h2>
+            <span>Profile information</span>
+        </div>
+
+        <div class="health-tile">
+            <i class="fa-solid fa-calculator"></i>
+            <p>BMI</p>
+            <h2 id="bmiValue">--</h2>
+            <span>Based on profile information</span>
+        </div>
+
+        <div class="health-tile">
+            <i class="fa-solid fa-heart"></i>
+            <p>ECG Record</p>
+            <h2 id="ecgValue">Not recorded</h2>
+            <span>Manual note only</span>
+        </div>
+
+    </section>
+
+    <!-- ADD HEALTH READING -->
+
+    <section class="dashboard-section reading-section">
+
+        <h2><i class="fa-solid fa-plus-circle"></i> Add Health Reading</h2>
+
+        <p>Enter a measurement to save it to your dashboard.</p>
+
+        <form id="healthReadingForm" onsubmit="saveHealthReading(event)">
+
+            <div class="reading-form-grid">
+
+                <div class="form-group">
+                    <label for="heartRate">Heart Rate (BPM)</label>
+                    <input type="number" id="heartRate" min="1" max="250" placeholder="Example: 75">
+                </div>
+
+                <div class="form-group">
+                    <label for="systolic">Systolic BP (mmHg)</label>
+                    <input type="number" id="systolic" min="1" max="300" placeholder="Example: 120">
+                </div>
+
+                <div class="form-group">
+                    <label for="diastolic">Diastolic BP (mmHg)</label>
+                    <input type="number" id="diastolic" min="1" max="200" placeholder="Example: 80">
+                </div>
+
+                <div class="form-group">
+                    <label for="oxygen">Oxygen Level (%)</label>
+                    <input type="number" id="oxygen" min="1" max="100" step="0.1" placeholder="Example: 98">
+                </div>
+
+                <div class="form-group">
+                    <label for="temperature">Temperature (°C)</label>
+                    <input type="number" id="temperature" min="25" max="45" step="0.1" placeholder="Example: 36.8">
+                </div>
+
+                <div class="form-group">
+                    <label for="respiratoryRate">Respiratory Rate (breaths/min)</label>
+                    <input type="number" id="respiratoryRate" min="1" max="100" placeholder="Example: 16">
+                </div>
+
+                <div class="form-group">
+                    <label for="ecgNote">ECG Record / Note</label>
+                    <input type="text" id="ecgNote" maxlength="150" placeholder="Enter an ECG note if available">
+                </div>
+
+            </div>
+
+            <button type="submit" class="primary-btn save-reading-btn">
+                <i class="fa-solid fa-floppy-disk"></i>
+                Save Reading
+            </button>
+
+        </form>
+
+        <p id="readingMessage" class="reading-message"></p>
+
+    </section>
+
+    <!-- HEALTH ALERT SETTINGS -->
+
+    <section class="dashboard-section">
+
+        <h2><i class="fa-solid fa-bell"></i> Health Alert Settings</h2>
+
+        <p>
+            Set personal reference limits based on guidance from a qualified
+            healthcare professional. Alerts only flag recorded values.
+        </p>
+
+        <form id="alertSettingsForm" onsubmit="saveAlertSettings(event)">
+
+            <div class="reading-form-grid">
+
+                <div class="form-group">
+                    <label for="minHeartRate">Heart Rate Minimum (BPM)</label>
+                    <input type="number" id="minHeartRate" min="1" max="250" placeholder="Optional">
+                </div>
+
+                <div class="form-group">
+                    <label for="maxHeartRate">Heart Rate Maximum (BPM)</label>
+                    <input type="number" id="maxHeartRate" min="1" max="250" placeholder="Optional">
+                </div>
+
+                <div class="form-group">
+                    <label for="minOxygen">Oxygen Minimum (%)</label>
+                    <input type="number" id="minOxygen" min="1" max="100" step="0.1" placeholder="Optional">
+                </div>
+
+            </div>
+
+            <button type="submit" class="primary-btn">
+                Save Alert Settings
+            </button>
+
+        </form>
+
+        <div id="healthAlerts" class="health-alerts">
+            No alerts to display.
+        </div>
+
+    </section>
+
+    <!-- HEALTH ANALYTICS -->
+
+    <h2 class="dashboard-section-title">
+        <i class="fa-solid fa-chart-line"></i> Health Analytics
+    </h2>
+
+    <section class="dashboard-section chart-section">
+        <h2>Heart Rate Trends</h2>
+        <p>Recorded heart-rate measurements over time.</p>
+        <div class="chart-container">
+            <canvas id="heartRateChart"></canvas>
+        </div>
+    </section>
+
+    <section class="dashboard-section chart-section">
+        <h2>Blood Pressure Trends</h2>
+        <p>Recorded systolic and diastolic measurements.</p>
+        <div class="chart-container">
+            <canvas id="bloodPressureChart"></canvas>
+        </div>
+    </section>
+
+    <section class="dashboard-section chart-section">
+        <h2>Oxygen Level Trends</h2>
+        <p>Recorded oxygen saturation measurements.</p>
+        <div class="chart-container">
+            <canvas id="oxygenChart"></canvas>
+        </div>
+    </section>
+
+    <!-- READING HISTORY -->
+
+    <section class="dashboard-section">
+        <h2><i class="fa-solid fa-clock-rotate-left"></i> Reading History</h2>
+        <p>Your previously saved measurements.</p>
+        <div id="readingHistory">
+            <p>No readings saved yet.</p>
+        </div>
+    </section>
+
+    <!-- MEDICAL HISTORY -->
+
+    <section class="dashboard-section medical-history-section">
+
+        <h2>
+            <i class="fa-solid fa-notes-medical"></i>
+            Medical History
+        </h2>
+
+        <p>
+            Record previous health problems, known allergies
+            and ongoing health conditions.
+        </p>
+
+        <form id="medicalHistoryForm">
+
+            <div class="reading-form-grid">
+
+                <div class="form-group">
+                    <label for="previousProblems">Previous Health Problems</label>
+                    <textarea
+                        id="previousProblems"
+                        rows="3"
+                        placeholder="Enter previous health problems..."
+                    ></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="allergies">Known Allergies</label>
+                    <textarea
+                        id="allergies"
+                        rows="3"
+                        placeholder="Enter known allergies..."
+                    ></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="ongoingConditions">Ongoing Health Conditions</label>
+                    <textarea
+                        id="ongoingConditions"
+                        rows="3"
+                        placeholder="Enter ongoing health conditions..."
+                    ></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="medicalNotes">Additional Notes</label>
+                    <textarea
+                        id="medicalNotes"
+                        rows="3"
+                        placeholder="Enter additional information..."
+                    ></textarea>
+                </div>
+
+            </div>
+
+            <button
+                type="button"
+                class="primary-btn"
+                onclick="saveMedicalHistory()"
+            >
+                <i class="fa-solid fa-floppy-disk"></i>
+                Save Medical History
+            </button>
+
+        </form>
+
+        <p id="medicalHistoryMessage" class="reading-message"></p>
+
+        <div class="medical-history-info">
+            <i class="fa-solid fa-shield-halved"></i>
+            Your information is intended for this educational
+            prototype. Do not enter real sensitive medical
+            information because browser storage is not secure
+            enough for actual medical records.
+        </div>
+
+    </section>
+
+    <!-- AI HEALTH ASSISTANT -->
+
+    <section class="dashboard-section ai-assistant-section" id="aiAssistant">
+
+        <h2>
+            <i class="fa-solid fa-robot"></i>
+            AI Health Assistant
+        </h2>
+
+        <p>
+            Ask questions about general health, wellness,
+            hydration, sleep and health measurements.
+        </p>
+
+        <div class="ai-assistant-box">
+
+            <div class="ai-welcome-message">
+                <i class="fa-solid fa-robot"></i>
+                <div>
+                    <strong>Welcome to Cardio Pulse Assistant!</strong>
+                    <p>
+                        Hello! I can help you understand general health
+                        and wellness topics. What would you like to know?
+                    </p>
+                </div>
+            </div>
+
+            <div class="ai-suggestions">
+                <button type="button" onclick="askSuggestion('Why is sleep important?')">
+                    Sleep
+                </button>
+
+                <button type="button" onclick="askSuggestion('How can I stay hydrated?')">
+                    Hydration
+                </button>
+
+                <button type="button" onclick="askSuggestion('What does BMI mean?')">
+                    BMI
+                </button>
+
+                <button type="button" onclick="askSuggestion('How can I improve my general fitness?')">
+                    Fitness
+                </button>
+            </div>
+
+            <div
+                id="aiChatMessages"
+                class="ai-chat-messages"
+                aria-live="polite"
+            ></div>
+
+            <form id="aiChatForm" class="ai-chat-form">
+
+                <input
+                    type="text"
+                    id="aiQuestion"
+                    placeholder="Ask your health question..."
+                    autocomplete="off"
+                    required
+                >
+
+                <button type="submit" class="primary-btn">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    Send
+                </button>
+
+            </form>
+
+            <p class="ai-disclaimer">
+                <i class="fa-solid fa-circle-info"></i>
+                Demo assistant with predefined educational responses.
+                It does not diagnose conditions or replace professional
+                medical advice. For concerning symptoms, speak with a
+                qualified healthcare professional.
+            </p>
+
+        </div>
+
+    </section>
+
+    <!-- DASHBOARD BOTTOM -->
+
+    <section class="dashboard-bottom">
+        <h2>Welcome to Cardio Pulse!</h2>
+        <p>
+            Cardio Pulse helps you record and understand your health measurements.
+            It is a tracking and educational prototype, not a medical diagnosis.
+        </p>
+    </section>
+
+</main>
+
+<script src="script.js"></script>
+
+<script>
+    // LOGIN CHECK
+
+    if (sessionStorage.getItem("cardioPulseLoggedIn") !== "true") {
+        window.location.href = "index.html";
+    }
+
+    // PROFILE INFORMATION
+
+    const profile = getUserProfile();
+
+    if (profile) {
+        document.getElementById("welcomeName").textContent =
+            "Welcome, " + profile.name;
+
+        document.getElementById("weightValue").textContent =
+            (profile.weight || "--") + " kg";
+
+        document.getElementById("bmiValue").textContent =
+            profile.bmi || "--";
+    }
+
+    // CURRENT DATE
+
+    document.getElementById("todayDate").textContent =
+        new Date().toLocaleDateString("en-IN", {
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+        });
+
+    // AI HEALTH ASSISTANT DEMO
+
+    const aiChatForm = document.getElementById("aiChatForm");
+    const aiQuestion = document.getElementById("aiQuestion");
+    const aiChatMessages = document.getElementById("aiChatMessages");
+
+    function addChatMessage(message, sender) {
+        const messageElement = document.createElement("div");
+
+        messageElement.className =
+            sender === "user" ? "ai-user-message" : "ai-bot-message";
+
+        messageElement.textContent = message;
+
+        aiChatMessages.appendChild(messageElement);
+
+        aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
+    }
+
+    function getAssistantResponse(question) {
+        const text = question.toLowerCase();
+
+        if (text.includes("sleep")) {
+            return "Sleep supports memory, concentration, mood and general health. Try keeping a regular sleep schedule and creating a calm bedtime routine. If sleep problems continue, discuss them with a healthcare professional.";
+        }
+
+        if (
+            text.includes("water") ||
+            text.includes("hydration") ||
+            text.includes("thirst")
+        ) {
+            return "Staying hydrated supports normal body functions. Drink water regularly throughout the day, and remember that your needs can vary with activity, weather and health.";
+        }
+
+        if (
+            text.includes("bmi") ||
+            text.includes("body mass")
+        ) {
+            return "BMI stands for Body Mass Index. It is calculated using weight and height. It is only a screening measure and does not describe someone's complete health. For children and teenagers, BMI needs age- and sex-specific interpretation by a healthcare professional.";
+        }
+
+        if (
+            text.includes("fitness") ||
+            text.includes("exercise") ||
+            text.includes("activity")
+        ) {
+            return "Regular enjoyable movement can support heart health, strength and mood. Choose activities that suit your ability, take breaks when needed and increase activity gradually.";
+        }
+
+        if (
+            text.includes("tired") ||
+            text.includes("fatigue") ||
+            text.includes("energy")
+        ) {
+            return "Feeling tired can have many possible causes, including sleep, stress, nutrition and health conditions. Notice how long it has been happening and discuss persistent or concerning tiredness with a healthcare professional.";
+        }
+
+        if (
+            text.includes("heart rate") ||
+            text.includes("heartbeat") ||
+            text.includes("pulse")
+        ) {
+            return "Heart rate is the number of heartbeats per minute. It can change with activity, emotions, rest, illness and other factors. A single reading cannot establish a diagnosis. If you have symptoms or concerns, seek professional advice.";
+        }
+
+        if (
+            text.includes("blood pressure") ||
+            text.includes("bp")
+        ) {
+            return "Blood pressure measures the force of blood against artery walls. Readings can vary depending on activity, stress and measurement technique. A healthcare professional can help interpret readings in context.";
+        }
+
+        if (
+            text.includes("oxygen") ||
+            text.includes("spo2")
+        ) {
+            return "Blood oxygen saturation estimates how much oxygen your blood is carrying. Home devices can sometimes give inaccurate readings. If you feel breathless or seriously unwell, seek medical help rather than relying on the device alone.";
+        }
+
+        if (
+            text.includes("temperature") ||
+            text.includes("fever")
+        ) {
+            return "Body temperature can vary during the day. A raised temperature may occur with infections and other conditions. Consider your symptoms as well as the reading, and seek medical advice if you are concerned.";
+        }
+
+        if (
+            text.includes("hello") ||
+            text.includes("hi") ||
+            text.includes("hey")
+        ) {
+            return "Hello! Welcome to Cardio Pulse. You can ask me about sleep, hydration, BMI, fitness and general health measurements.";
+        }
+
+        return "I can provide general educational information about sleep, hydration, BMI, fitness, heart rate, blood pressure, oxygen levels and temperature. Try asking about one of these topics. I cannot diagnose symptoms or recommend medication.";
+    }
+
+    function sendAIQuestion(question) {
+        const cleanQuestion = question.trim();
+
+        if (!cleanQuestion) {
+            return;
+        }
+
+        addChatMessage(cleanQuestion, "user");
+
+        const response = getAssistantResponse(cleanQuestion);
+
+        addChatMessage(response, "assistant");
+    }
+
+    aiChatForm.addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        sendAIQuestion(aiQuestion.value);
+
+        aiQuestion.value = "";
+    });
+
+    function askSuggestion(question) {
+        sendAIQuestion(question);
+    }
+</script>
+
+</body>
+</html>
